@@ -34,7 +34,7 @@ public class CompanyController {
      * 3.响应
      */
     @RequestMapping(value = "/{id}",method = RequestMethod.PUT)
-    public Result update(@PathVariable(value="id") String id, @RequestBody Company company ) {
+    public Result update(@PathVariable(value="id") String id, @RequestBody Company company ) throws CommonException {
         //业务操作
         company.setId(id);
         companyService.update(company);
@@ -50,12 +50,11 @@ public class CompanyController {
 
     //根据id查询企业
     @RequestMapping(value="/{id}",method = RequestMethod.GET)
-    public Result findById(@PathVariable(value="id") String id) throws CommonException {
-        throw new CommonException(ResultCode.UNAUTHORISE);
-//        Company company = companyService.findById(id);
-//        Result result = new Result(ResultCode.SUCCESS);
-//        result.setData(company);
-//        return result;
+    public Result findById(@PathVariable(value="id") String id){
+        Company company = companyService.findById(id);
+        Result result = new Result(ResultCode.SUCCESS);
+        result.setData(company);
+        return result;
     }
 
     //查询全部企业列表
@@ -65,5 +64,17 @@ public class CompanyController {
         Result result = new Result(ResultCode.SUCCESS);
         result.setData(list);
         return result;
+    }
+
+
+    //更新企业状态
+//    @CrossOrigin
+    @RequestMapping(value="/{id}/state/{state}",method = RequestMethod.PUT)
+    public Result findAll(@PathVariable(value = "id") String id ,
+                          @PathVariable(value = "state") int state) {
+        Company company = companyService.findById(id);
+        company.setState(state);
+        companyService.save(company);
+        return new Result(ResultCode.SUCCESS);
     }
 }
