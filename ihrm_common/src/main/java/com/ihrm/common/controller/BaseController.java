@@ -9,7 +9,7 @@ public class BaseController {
 
     protected HttpServletRequest request;
     protected HttpServletResponse response;
-    protected String companyId;
+    protected String companyId = "1";
     protected String companyName;
 
     @ModelAttribute
