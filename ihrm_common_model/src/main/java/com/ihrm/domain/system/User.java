@@ -92,6 +92,8 @@ public class User implements Serializable {
 
     private String departmentName;
 
+    private String level;
+
 
     @ManyToMany
     @JsonIgnore
