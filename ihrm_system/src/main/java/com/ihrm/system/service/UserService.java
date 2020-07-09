@@ -5,6 +5,7 @@ import com.ihrm.domain.system.Role;
 import com.ihrm.domain.system.User;
 import com.ihrm.system.dao.RoleDao;
 import com.ihrm.system.dao.UserDao;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +40,9 @@ public class UserService {
         String id = idWorker.nextId()+"";
         user.setId(id);
         //调用dao保存用户
-        user.setPassword("123456");
+        user.setLevel("user");
+        String password = new Md5Hash("123456", user.getMobile(), 3).toString();
+        user.setPassword(password);
         user.setEnableState(1);
         userDao.save(user);
     }

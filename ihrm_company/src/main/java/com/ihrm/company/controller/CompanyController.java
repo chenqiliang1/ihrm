@@ -51,7 +51,7 @@ public class CompanyController {
     //根据id查询企业
     @RequestMapping(value="/{id}",method = RequestMethod.GET)
     public Result findById(@PathVariable(value="id") String id){
-        Company company = companyService.findById(id);
+        Company company = companyService. findById(id);
         Result result = new Result(ResultCode.SUCCESS);
         result.setData(company);
         return result;

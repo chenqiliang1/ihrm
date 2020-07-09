@@ -4,6 +4,8 @@
     <file url="file://$PROJECT_DIR$/ihrm_common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ihrm_common_model/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ihrm_company/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ihrm_employee/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ihrm_eureka/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ihrm_system/src/main/java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>

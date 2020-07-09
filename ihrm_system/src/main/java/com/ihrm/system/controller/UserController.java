@@ -4,26 +4,23 @@ import com.ihrm.common.controller.BaseController;
 import com.ihrm.common.entity.PageResult;
 import com.ihrm.common.entity.Result;
 import com.ihrm.common.entity.ResultCode;
-
-import com.ihrm.common.exception.CommonException;
 import com.ihrm.common.utils.JwtUtils;
-import com.ihrm.common.utils.PermissionConstants;
-import com.ihrm.domain.system.Permission;
-import com.ihrm.domain.system.Role;
-import com.ihrm.domain.system.response.ProfileResult;
 import com.ihrm.domain.system.User;
+import com.ihrm.domain.system.response.ProfileResult;
 import com.ihrm.domain.system.response.UserResult;
 import com.ihrm.system.service.PermissionService;
-import com.ihrm.system.service.RoleService;
 import com.ihrm.system.service.UserService;
-import io.jsonwebtoken.Claims;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -114,6 +111,7 @@ public class UserController extends BaseController {
     /**
      * 根据id删除
      */
+    @RequiresPermissions(value = "API-USER-DELETE")
     @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE,name = "API-USER-DELETE")
     public Result delete(@PathVariable(value = "id") String id) {
         userService.deleteById(id);
@@ -132,28 +130,15 @@ public class UserController extends BaseController {
     public Result login(@RequestBody Map<String,String> loginMap) {
         String mobile = loginMap.get("mobile");
         String password = loginMap.get("password");
-        User user = userService.findByMobile(mobile);
-        //登录失败
-        if(user == null || !user.getPassword().equals(password)) {
+        try {
+            password = new Md5Hash(password, mobile, 3).toString();
+            UsernamePasswordToken upToken = new UsernamePasswordToken(mobile,password);
+            Subject subject = SecurityUtils.getSubject();
+            subject.login(upToken);
+            String sessionId = (String)subject.getSession().getId();
+            return new Result(ResultCode.SUCCESS,sessionId);
+        }catch(Exception e){
             return new Result(ResultCode.MOBILEORPASSWORDERROR);
-        }else {
-            //登录成功
-            //api权限字符串
-            StringBuilder sb = new StringBuilder();
-            //获取到所有的可访问API权限
-            for (Role role : user.getRoles()) {
-                for (Permission perm : role.getPermissions()) {
-                    if(perm.getType() == PermissionConstants.PERMISSION_API) {
-                        sb.append(perm.getCode()).append(",");
-                    }
-                }
-            }
-            Map<String,Object> map = new HashMap<>();
-            map.put("apis",sb.toString());//可访问的api权限字符串
-            map.put("companyId",user.getCompanyId());
-            map.put("companyName",user.getCompanyName());
-            String token = jwtUtils.createJwt(user.getId(), user.getUsername(), map);
-            return new Result(ResultCode.SUCCESS,token);
         }
     }
 
@@ -167,25 +152,10 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value="/profile",method = RequestMethod.POST)
     public Result profile(HttpServletRequest request) throws Exception {
-        String authorization = request.getHeader("Authorization");
-        if(StringUtils.isEmpty(authorization)){
-            throw new CommonException(ResultCode.UNAUTHENTICATED);
-        }
-        String token = authorization.replace("Bearer ","");
-        Claims claims = jwtUtils.parseJwt(token);
-        String userId = claims.getId();
-        User user = userService.findById(userId);
-        ProfileResult result = null;
-        if("user".equals(user.getLevel())) {
-            result = new ProfileResult(user);
-        }else {
-            Map map = new HashMap();
-            if("coAdmin".equals(user.getLevel())) {
-                map.put("enVisible","1");
-            }
-            List<Permission> list = permissionService.findAll(map);
-            result = new ProfileResult(user,list);
-        }
+
+        Subject subject = SecurityUtils.getSubject();
+        PrincipalCollection principals = subject.getPrincipals();
+        ProfileResult result = (ProfileResult) principals.getPrimaryPrincipal();
         return new Result(ResultCode.SUCCESS,result);
     }
 }

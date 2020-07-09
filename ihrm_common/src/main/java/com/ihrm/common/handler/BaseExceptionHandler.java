@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,5 +31,11 @@ public class BaseExceptionHandler {
             Result result = new Result(ResultCode.SERVER_ERROR);
             return result;
         }
+    }
+
+    @ExceptionHandler(value = AuthenticationException.class)
+    @ResponseBody
+    public Result error(HttpServletRequest request, HttpServletResponse response, AuthenticationException e){
+        return new Result(ResultCode.UNAUTHORISE);
     }
 }
