@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Configuration(value = "ihrm_employee")
+@Configuration
 public class ShiroConfiguration {
 
     @Value("${spring.redis.host}")
@@ -62,17 +62,14 @@ public class ShiroConfiguration {
          *      支持通配符的形式
          * value：过滤器类型
          *      shiro常用过滤器
-         *          anon    ：匿名访问（表明此链接所有人可以访问）
+         *          anno    ：匿名访问（表明此链接所有人可以访问）
          *          authc   ：认证后访问（表明此链接需登录认证成功之后可以访问）
          */
         Map<String,String> filterMap = new LinkedHashMap<String,String>();
         //配置请求连接过滤器配置
         //匿名访问（所有人员可以使用）
-        filterMap.put("/sys/login", "anon");
+        filterMap.put("/frame/login", "anon");
         filterMap.put("/autherror", "anon");
-        filterMap.put("/employees/export/*" , "anon");
-        filterMap.put("/employees/*/pdf" , "anon");
-
         //认证之后访问（登录之后可以访问）
         filterMap.put("/**", "authc");
 

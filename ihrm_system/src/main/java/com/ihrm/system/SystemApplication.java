@@ -16,6 +16,7 @@ import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 @SpringBootApplication(scanBasePackages = "com.ihrm")
 //2.配置jpa注解的扫描
 @EntityScan(value="com.ihrm.domain.system")
+
 public class SystemApplication {
 
 

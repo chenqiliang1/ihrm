@@ -11,7 +11,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/ihrm?useUnicode=true&characterEncoding=utf8
     username: root
-    password: 111111
+    password: a13413350960
   jpa:
     database: MySQL
     show-sql: true
