@@ -1,5 +1,6 @@
 package com.ihrm.system.service;
 
+import com.baidu.aip.util.Base64Util;
 import com.ihrm.common.service.BaseService;
 import com.ihrm.common.utils.IdWorker;
 import com.ihrm.common.utils.QiniuUploadUtil;
@@ -7,6 +8,7 @@ import com.ihrm.domain.system.Role;
 import com.ihrm.domain.system.User;
 import com.ihrm.system.dao.RoleDao;
 import com.ihrm.system.dao.UserDao;
+import com.ihrm.system.utils.BaiduAiUtil;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,7 +37,8 @@ public class UserService extends BaseService{
     @Autowired
     private IdWorker idWorker;
 
-
+    @Autowired
+    private BaiduAiUtil baiduAiUtil;
     /**
      * 根据mobile查询用户
      */
@@ -191,6 +194,13 @@ public class UserService extends BaseService{
         //3.更新用户头像地址
         user.setStaffPhoto(imgUrl);
         userDao.save(user);
+        String encode = Base64Util.encode(file.getBytes());
+        Boolean aBoolean = baiduAiUtil.faceExist(id);
+        if(aBoolean){
+            baiduAiUtil.faceRegister(id,encode);
+        }else{
+            baiduAiUtil.faceUpdate(id,encode);
+        }
         //4.返回
         return imgUrl;
     }
